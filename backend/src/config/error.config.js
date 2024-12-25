@@ -49,6 +49,16 @@ const ERRORS = {
     "DEFAULT_MESSAGE": "Invalid token.",
     "HTTP_CODE": 401
   },
+  "INVALID_OTP": {
+    "CODE": 14,
+    "DEFAULT_MESSAGE": "Invalid OTP.",
+    "HTTP_CODE": 400
+  },
+  "OTP_NOT_FOUND": {
+    "CODE": 15,
+    "DEFAULT_MESSAGE": "OTP not found.",
+    "HTTP_CODE": 404
+  },
 }
 
 export default ERRORS;
