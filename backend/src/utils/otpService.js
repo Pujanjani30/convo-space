@@ -11,13 +11,13 @@ const verifyReceivedOtp = async (email, otp) => {
   try {
     const otpRecord = await Otp.findOne({ otp_user_email: email }).sort({ createdAt: -1 });
     if (!otpRecord) {
-      throw new Error("OTP_NOT_FOUND");
+      throw new Error("OTP_EXPIRED");
     }
 
-    return otpRecord.otp_code === otp;
+    return otpRecord?.otp_code === otp;
   } catch (error) {
     console.error("Error verifying OTP: ", error);
-    throw new Error("Error verifying OTP");
+    throw error;
   }
 };
 

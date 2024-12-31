@@ -1,11 +1,10 @@
 import ERRORS from '../config/error.config.js';
 
-const successResponse = ({ res, data = undefined, message, token = undefined }) => {
+const successResponse = ({ res, data = undefined, message }) => {
   res.status(200).json({
     status: 200,
     message,
-    data,
-    token
+    data
   });
 }
 
