@@ -22,12 +22,22 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: 'Hey there! I am using ConvoSpace.'
   },
-  user_contacts: [
+  user_friends: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
+  user_friendRequests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  user_isNew: {
+    type: Boolean,
+    default: true,
+  },
   user_refreshToken: {
     type: String,
   },

@@ -19,9 +19,9 @@ const ERRORS = {
     'DEFAULT_MESSAGE': 'Server error. Please try again after some time.',
     'HTTP_CODE': 500
   },
-  'USER_NOT_EXISTS': {
+  'USER_NOT_FOUND': {
     'CODE': 4,
-    'DEFAULT_MESSAGE': 'User does not exists.',
+    'DEFAULT_MESSAGE': 'User not found.',
     'HTTP_CODE': 404
   },
   'INVALID_CREDENTIALS': {
@@ -54,10 +54,30 @@ const ERRORS = {
     "DEFAULT_MESSAGE": "Invalid OTP.",
     "HTTP_CODE": 400
   },
-  "OTP_NOT_FOUND": {
+  "OTP_EXPIRED": {
     "CODE": 15,
-    "DEFAULT_MESSAGE": "OTP not found.",
-    "HTTP_CODE": 404
+    "DEFAULT_MESSAGE": "OTP expired.",
+    "HTTP_CODE": 400
+  },
+  "FRINED_REQUEST_ALREADY_SENT": {
+    "CODE": 16,
+    "DEFAULT_MESSAGE": "Friend request already sent.",
+    "HTTP_CODE": 400
+  },
+  "FRINED_REQUEST_NOT_FOUND": {
+    "CODE": 17,
+    "DEFAULT_MESSAGE": "Friend request not found.",
+    "HTTP_CODE": 400
+  },
+  "CANNOT_SEND_REQUEST_TO_SELF": {
+    "CODE": 18,
+    "DEFAULT_MESSAGE": "Cannot send friend request to self.",
+    "HTTP_CODE": 400
+  },
+  "FIELD_REQUIRED": {
+    "CODE": 18,
+    "DEFAULT_MESSAGE": "Missing required fields.",
+    "HTTP_CODE": 400
   },
 }
 

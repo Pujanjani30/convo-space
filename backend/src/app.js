@@ -1,15 +1,20 @@
 // external packages
 import 'dotenv/config';
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
+import cookieParser from 'cookie-parser';
 
 // database connection
 import './db/index.js';
 
 // api routes setup
 import createApi from './api/v1/index.js';
+
+// WebSocket setup
+import initializeWebSocket from './websocket.js';
 
 // environment vars
 const PORT = process.env.PORT || 8000;
@@ -38,6 +43,9 @@ app.use(express.static('public'));
 // parse URL-encoded request body
 app.use(express.urlencoded({ extended: true }));
 
+// parse cookies
+app.use(cookieParser());
+
 // sanitize request data to prevent MongoDB query injection
 app.use(mongoSanitize());
 
@@ -59,9 +67,17 @@ app.use('*', (req, res) => {
   res.status(404).send('404 Not found');
 });
 
+// Create an HTTP server instance
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+initializeWebSocket(server);
+
 // start the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+
 
 export default app;

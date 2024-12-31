@@ -1,22 +1,51 @@
-import React, { useState } from 'react';
+// React and hooks
+import React, { useState, useContext } from 'react';
+
+// External Packages
+import * as Yup from 'yup';
+
+// Context
+import AuthContext from '../../context/AuthContext.js';
+
+// Assets
 import PeopleChatting from '../../assets/people_chatting.svg'
 import ChatIcon from '../../assets/chat_icon.png'
-import OtpInput from './OtpInput';
-import { sendOtp } from '../../api/auth.js';
 
+// Components
+import OtpInput from './OtpInput.jsx';
+
+// Utils
+import { showSuccessToast, showErrorToast } from '../../utils/toast.js';
+
+// Login Component
 const Login = () => {
+  const { sendOtp, loading } = useContext(AuthContext);
   const [showOtp, setShowOtp] = useState(false);
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+
+  // Validation Schema
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email('Invalid email address')
+      .required('Email is required'),
+  });
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (email) {
-      setLoading(true);
-      await sendOtp(email);
-      setShowOtp(true);
-      setLoading(false);
+
+    try {
+      await validationSchema.validate({ email }); // Validate email
+
+      const response = await sendOtp(email);
+      if (response.success) {
+        setShowOtp(true);
+        showSuccessToast(response.message);
+      }
+      else {
+        showErrorToast(response.message);
+      }
+    } catch (error) {
+      showErrorToast(error.message);
     }
   };
 
@@ -25,8 +54,13 @@ const Login = () => {
   };
 
   const handleResendOtp = async () => {
-    setOtp(["", "", "", "", "", ""]);
-    await sendOtp(email);
+    const response = await sendOtp(email);
+    if (response.success) {
+      showSuccessToast(response.message);
+    }
+    else {
+      showErrorToast(response.message);
+    }
   }
 
   return (
@@ -52,6 +86,8 @@ const Login = () => {
       {/* Right Section */}
       <div className="md:w-1/2 bg-black flex flex-col justify-center items-center p-10">
         <h2 className="text-white text-4xl font-semibold mb-8">Login</h2>
+
+        {/* If showOtp is false, show the email form else show the OTP form */}
         {!showOtp ? (
           <form className="w-full max-w-sm" onSubmit={handleSendOtp}>
             {/* Email */}
@@ -63,19 +99,19 @@ const Login = () => {
                 Email
               </label>
               <input
-                type="email"
+                type="text"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.trim())}
                 placeholder="Enter email"
                 className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
-            {/* Submit Button */}
 
+            {/* Submit Button */}
             <button
               type="submit"
-              {...(loading && { disabled: true })}
+              disabled={loading}
               className="w-full bg-blue-600 text-black font-medium py-2 rounded-lg hover:bg-blue-700 transition"
             >
               {loading ? "Sending..." : "Send OTP"}
