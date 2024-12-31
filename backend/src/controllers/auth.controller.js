@@ -65,6 +65,7 @@ const logout = async (req, res) => {
 const refreshAccessToken = async (req, res) => {
   try {
     const incomingRefreshToken = req.cookies.refreshToken;
+    console.log(incomingRefreshToken);
     if (!incomingRefreshToken) {
       throw new Error('UNAUTHORIZED');
     }
