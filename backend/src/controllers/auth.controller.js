@@ -24,7 +24,8 @@ const verifyOtp = async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true
+      secure: true,
+      sameSite: 'None'
     }
 
     res.cookie('accessToken', response.accessToken, options);
@@ -47,7 +48,8 @@ const logout = async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true
+      secure: true,
+      sameSite: 'None'
     }
 
     res.clearCookie('accessToken', options);
@@ -75,7 +77,8 @@ const refreshAccessToken = async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true
+      secure: true,
+      sameSite: 'None'
     }
 
     res.cookie('accessToken', response.accessToken, options);

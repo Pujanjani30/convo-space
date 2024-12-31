@@ -28,6 +28,9 @@ const app = express();
 // set security HTTP headers
 app.use(helmet());
 
+// // Set trust proxy to 1 to trust the first proxy (e.g., Render, Vercel)
+// app.set('trust proxy', 1);
+
 // enable cors
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
