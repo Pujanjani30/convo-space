@@ -1,5 +1,5 @@
-// emailService.js
 import nodemailer from 'nodemailer';
+import loginOtpEmailTemplate from '../email-template/login-otp.js';
 
 // Create a transporter object using SMTP transport
 const createTransporter = () => {
@@ -22,7 +22,7 @@ const sendEmail = async (email, otp) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'OTP for ConvoSpace Login',
-      text: `Your OTP for ConvoSpace Login is ${otp}`,
+      html: loginOtpEmailTemplate.replace('{otp}', otp)
     });
 
     console.log('Message sent: %s', info.messageId);
