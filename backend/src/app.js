@@ -13,6 +13,9 @@ import './db/index.js';
 // api routes setup
 import createApi from './api/v1/index.js';
 
+// Initialize cron jobs
+import './cron/index.js';
+
 // WebSocket setup
 import initializeWebSocket from './websocket.js';
 
