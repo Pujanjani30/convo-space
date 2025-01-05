@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { getMessages, deleteMessage } from '../../api/chat.api.js';
 import DefaultPicIcon from "../../assets/default-profile-pic.jpg";
+import ConfirmDialog from "../common/ConfirmDialog.jsx";
 
 const ChatWindow = ({ selectedChat, socket, user }) => {
   const [message, setMessage] = useState("");
@@ -11,6 +12,7 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
   const [selectedMessages, setSelectedMessages] = useState([]);
   const [activeMessage, setActiveMessage] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Effect to fetch messages for the selected chat
   useEffect(() => {
@@ -68,7 +70,7 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
 
   const handleSelectButtonClick = (msgId) => {
     setIsSelecting(!isSelecting); // Toggle select mode
-    handleSelectMessage(msgId);
+    // handleSelectMessage(msgId);
     setMenuOpen(false);
   };
 
@@ -78,6 +80,7 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
   };
 
   const handleMessageMenuClick = (msg, index) => {
+    if (isSelecting) return; // Disable menu in select mode
     setActiveMessage(index); // Set the active message index
     setMenuOpen(!menuOpen); // Toggle menu visibility
   };
@@ -92,6 +95,7 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
     try {
       await deleteMessage(messages);
       setMessages((prevMessages) => prevMessages.filter((msg) => !messages.includes(msg._id)));
+      setIsDialogOpen(false);
       setSelectedMessages([]);
       setIsSelecting(!isSelecting);
     } catch (error) {
@@ -115,11 +119,11 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-end space-x-4 bg-gray-900 p-2 border-b border-gray-700">
+        <div className="flex items-center justify-end space-x-4 bg-gray-900 p-3 border-b border-gray-700">
           <div className="text-white">{selectedMessages.length} selected</div>
           <button
             className="text-white bg-blue-700 px-4 py-1 rounded"
-            onClick={() => handleDeleteMessages(selectedMessages)}
+            onClick={() => setIsDialogOpen(true)}
           >
             Delete
           </button>
@@ -133,32 +137,31 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
 
       )}
 
-      <div id="chatContainer" className="flex-grow p-3 space-y-4 overflow-y-auto relative">
+      <div id="chatContainer" className="flex-grow py-3 space-y-4 overflow-y-auto relative"
+        onClick={menuOpen ? () => setMenuOpen(false) : null} // Close menu on outside click
+      >
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex ${msg.senderId === user._id ? "justify-end" : "justify-start"}
+            id={`message-${index}`} // Unique ID for each message
+            className={`flex px-3 ${msg.senderId === user._id ? "justify-end" : "justify-start"}
             ${selectedMessages.includes(msg._id) ? "bg-gray-400" : ""}
             `}
           >
             <div>
               <div
-                className={`flex justify-between space-x-4 max-w-xs px-3 py-2 rounded-lg 
+                className={`flex justify-between space-x-4 max-w-xs px-3 py-2 rounded-lg relative
                   ${msg.senderId === user._id ? "bg-blue-600 text-white" : "bg-gray-300 text-black"}
                   ${isSelecting ? "cursor-pointer" : "cursor-default"} 
               `} // Highlight selected message
                 onClick={() => handleSelectMessage(msg._id)} // Toggle selection
+                onContextMenu={(e) => {
+                  e.preventDefault(); // Prevent default right-click menu
+                  handleMessageMenuClick(msg, index); // Show message menu
+                }
+                }
               >
                 <div>{msg.text}</div>
-                <div
-                  className={`${msg.senderId === user._id ? "" : "hidden"}`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering message selection
-                    handleMessageMenuClick(msg, index);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faEllipsisVertical} />
-                </div>
               </div>
               <div className={`text-xs opacity-75 ${msg.senderId === user._id ? "text-right" : "text-left"}`}>
                 {new Date(msg.timestamp).toLocaleTimeString()}
@@ -170,20 +173,23 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
         {/* Show menu only for the active message */}
         {menuOpen && (
           <div
-            className="absolute flex flex-col top-16 right-16 bg-gray-800 px-3 py-1 rounded-lg"
+            className="absolute flex flex-col bg-gray-800 rounded-lg"
             style={{
-              top: `${activeMessage * 50 + 30}px`, // Position menu near the selected message
-              right: '0px'
+              top: document.getElementById(`message-${activeMessage}`).offsetTop + 20,
+              right: document.getElementById(`message-${activeMessage}`).offsetLeft + 20
             }}
           >
             <button
-              className="text-white"
-              onClick={() => handleSelectButtonClick(messages[activeMessage]._id)}
+              className="text-white border-b px-4 py-1 hover:bg-gray-700 hover:rounded-t-lg"
+              onClick={() => {
+                handleSelectButtonClick(messages[activeMessage]._id);
+                setSelectedMessages([...selectedMessages, messages[activeMessage]._id]);
+              }}
             >
               Select
             </button>
             <button
-              className="text-white"
+              className="text-white px-4 py-1 hover:bg-gray-700 hover:rounded-lg"
               onClick={() => {
                 handleDeleteMessages([messages[activeMessage]._id]);
               }}
@@ -210,6 +216,15 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
           <FontAwesomeIcon icon={faPaperPlane} />
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        title="Delete Messages?"
+        message="This has no effect on your recipient's chats."
+        confirmBtnStyle={"bg-red-600 hover:bg-red-700"}
+        onConfirm={() => handleDeleteMessages(selectedMessages)}
+        onCancel={() => setIsDialogOpen(false)}
+      />
     </div >
   );
 };

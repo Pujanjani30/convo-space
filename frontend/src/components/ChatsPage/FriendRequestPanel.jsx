@@ -81,7 +81,7 @@ const FriendRequestPanel = ({ isOpen, onClose, onFriendSelect }) => {
 
   return (
     <div
-      className={`fixed top-0 right-0 h-full w-96 bg-gray-800 shadow-lg 
+      className={`fixed top-0 right-0 h-full w-96 bg-gray-800 shadow-lg z-40
         transition-transform duration-300 ease-in-out 
         transform ${isOpen ? "translate-x-0" : "translate-x-full"
         }`}

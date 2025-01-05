@@ -10,9 +10,12 @@ function ChatPage() {
   const [selectedChat, setSelectedChat] = useState(null);
   const { user } = useContext(AuthContext);
   const { socket, isSocketReady } = useSocket();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!isSocketReady || !socket) return; // Wait until socket is ready
+
+    setIsLoading(true);
 
     getChats()
       .then((res) => {
@@ -22,6 +25,9 @@ function ChatPage() {
       })
       .catch((err) => {
         console.log(err.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
 
 
@@ -41,7 +47,11 @@ function ChatPage() {
   return (
     <div className="flex h-screen bg-black text-white">
       <Sidebar chats={chats} onChatSelect={handleChatSelect} />
-      {selectedChat ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center text-gray-400 h-full">
+          Loading...
+        </div>
+      ) : selectedChat ? (
         <ChatWindow selectedChat={selectedChat} socket={socket} user={user} />
       ) : (
         <div className="flex-1 flex items-center justify-center text-gray-400">
