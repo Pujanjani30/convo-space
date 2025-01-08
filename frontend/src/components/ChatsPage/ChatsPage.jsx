@@ -25,6 +25,7 @@ function ChatPage() {
       })
       .catch((err) => {
         console.log(err.message);
+        setChats([]);
       })
       .finally(() => {
         setIsLoading(false);
@@ -36,7 +37,7 @@ function ChatPage() {
     });
 
     return () => {
-      socket.off("updateSidebar");
+      if (socket) socket.off("updateSidebar");
     };
   }, [socket, isSocketReady]);
 
@@ -46,17 +47,21 @@ function ChatPage() {
 
   return (
     <div className="flex h-screen bg-black text-white">
-      <Sidebar chats={chats} onChatSelect={handleChatSelect} />
       {isLoading ? (
         <div className="flex items-center justify-center text-gray-400 h-full">
           Loading...
         </div>
-      ) : selectedChat ? (
-        <ChatWindow selectedChat={selectedChat} socket={socket} user={user} />
       ) : (
-        <div className="flex-1 flex items-center justify-center text-gray-400">
-          Select a chat to start messaging
-        </div>
+        <>
+          <Sidebar chats={chats} onChatSelect={handleChatSelect} />
+          {selectedChat ? (
+            <ChatWindow selectedChat={selectedChat} socket={socket} user={user} />
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-gray-400">
+              Select a chat to start messaging
+            </div>
+          )}
+        </>
       )}
     </div>
   );
