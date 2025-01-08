@@ -23,8 +23,8 @@ const initializeWebSocket = (server) => {
     users.set(userId, socket.id);
     socket.join(userId);
 
-    // Broadcast to others that the user is online
-    socket.broadcast.emit('userOnline', userId);
+    // Emit the online status to all connected users
+    io.emit('userOnline', userId);
 
     socket.on('sendMessage', async (messageData) => {
       const { text, senderId, recipientId, timestamp } = messageData;
@@ -69,8 +69,8 @@ const initializeWebSocket = (server) => {
         if (socketId === socket.id) {
           users.delete(userId);
 
-          // Broadcast to others that the user is offline
-          socket.broadcast.emit('userOffline', userId);
+          // Emit the offline status to all connected users
+          io.emit('userOffline', userId);
 
 
           // // Update the user's last seen time in the database
