@@ -47,7 +47,7 @@ function ChatPage() {
 
   return (
     <div className="flex h-screen bg-black text-white">
-      {isLoading ? (
+      {isSocketReady && isLoading ? (
         <div className="flex items-center justify-center text-gray-400 h-full">
           Loading...
         </div>
