@@ -125,6 +125,10 @@ const getFriends = async (userId) => {
   return user.user_friends;
 };
 
+const updateUserLastSeen = async (userId, lastSeen) => {
+  await User.findByIdAndUpdate(userId, { user_lastSeen: lastSeen });
+};
+
 export {
   getUserProfile,
   searchUserByEmail,
@@ -134,4 +138,5 @@ export {
   rejectFriendRequest,
   getFriendRequests,
   getFriends,
+  updateUserLastSeen,
 };

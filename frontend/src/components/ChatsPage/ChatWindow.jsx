@@ -116,6 +116,9 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
           </div>
           <div>
             <div className="font-bold">{selectedChat?.otherUser || selectedChat?.user_name}</div>
+            <div className="text-sm text-gray-400">
+              {selectedChat?.isOnline ? "Online" : "Offline"}
+            </div>
           </div>
         </div>
       ) : (

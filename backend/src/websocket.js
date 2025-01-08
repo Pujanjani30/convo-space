@@ -1,7 +1,8 @@
 // import mongoose from 'mongoose';
 import { Server } from 'socket.io';
-import { getMessages, saveMessage, getUnseenMessages } from './services/message.service.js';
+import { saveMessage } from './services/message.service.js';
 import { getChats } from './services/chat.service.js';
+import { updateUserLastSeen } from './services/user.service.js';
 
 const initializeWebSocket = (server) => {
   const io = new Server(server, {
@@ -21,6 +22,9 @@ const initializeWebSocket = (server) => {
 
     users.set(userId, socket.id);
     socket.join(userId);
+
+    // Broadcast to others that the user is online
+    socket.broadcast.emit('userOnline', userId);
 
     socket.on('sendMessage', async (messageData) => {
       const { text, senderId, recipientId, timestamp } = messageData;
@@ -60,10 +64,25 @@ const initializeWebSocket = (server) => {
       }
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       for (const [userId, socketId] of users.entries()) {
         if (socketId === socket.id) {
           users.delete(userId);
+
+          // Broadcast to others that the user is offline
+          socket.broadcast.emit('userOffline', userId);
+
+
+          // // Update the user's last seen time in the database
+          // try {
+          //   const lastSeen = new Date();
+          //   await updateUserLastSeen(userId, lastSeen);
+
+          //   // Broadcast the updated last seen time to others
+          //   socket.broadcast.emit('updateLastSeen', { userId, lastSeen });
+          // } catch (error) {
+          //   console.error(`Failed to update last seen for user ${userId}:`, error);
+          // }
           break;
         }
       }

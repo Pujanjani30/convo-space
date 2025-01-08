@@ -8,7 +8,7 @@ import { getChats } from "../../api/chat.api.js";
 function ChatPage() {
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const { socket, isSocketReady } = useSocket();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,14 +31,51 @@ function ChatPage() {
         setIsLoading(false);
       });
 
-
+    // Listen for updates to the sidebar
     socket.on("updateSidebar", (data) => {
       setChats(data);
     });
 
+    // // update user's last seen
+    // socket.on("updateLastSeen", ({ userId, lastSeen }) => {
+    //   if (user._id === userId) {
+    //     setUser((prevUser) => ({ ...prevUser, user_lastSeen: lastSeen }));
+    //   }
+    // });
+
+    // update user's status to online when connected
+    socket.on("userOnline", (userId) => {
+      setChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat._id === userId) {
+            return { ...chat, isOnline: true };
+          }
+          return chat;
+        });
+      });
+    });
+
+    // update user's status to offline when disconnected
+    socket.on("userOffline", (userId) => {
+      setChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat._id === userId) {
+            return { ...chat, isOnline: false };
+          }
+          return chat;
+        });
+      });
+    });
+
     return () => {
-      if (socket) socket.off("updateSidebar");
+      if (socket) {
+        socket.off("updateSidebar");
+        // socket.off("updateLastSeen");
+        socket.off("userOnline");
+        socket.off("userOffline");
+      }
     };
+
   }, [socket, isSocketReady]);
 
   const handleChatSelect = (chat) => {
