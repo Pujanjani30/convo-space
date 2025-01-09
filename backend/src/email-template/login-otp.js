@@ -42,6 +42,7 @@ let html = `<html lang="en">
             font-weight: bold;
             color: #3498db;
             margin: 20px 0;
+            letter-spacing: 10px;
         }
         .message {
             font-size: 16px;
