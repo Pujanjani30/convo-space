@@ -23,14 +23,11 @@ const initializeWebSocket = (server) => {
     users.set(userId, socket.id);
     socket.join(userId);
 
-    // Emit the online status to all connected users
-    io.emit('userOnline', userId);
+    // Emit the online status only to other connected users
+    // socket.broadcast.emit('userOnline', userId);
 
     socket.on('sendMessage', async (messageData) => {
       const { text, senderId, recipientId, timestamp } = messageData;
-
-      // const senderObjectId = new mongoose.Types.ObjectId(senderId);
-      // const recipientObjectId = new mongoose.Types.ObjectId(recipientId);
 
       try {
         const newMessage = await saveMessage({
@@ -65,24 +62,13 @@ const initializeWebSocket = (server) => {
     });
 
     socket.on('disconnect', async () => {
-      for (const [userId, socketId] of users.entries()) {
+      for (const [id, socketId] of users.entries()) {
         if (socketId === socket.id) {
-          users.delete(userId);
+          users.delete(id);
 
-          // Emit the offline status to all connected users
-          io.emit('userOffline', userId);
+          // Emit the offline status to other connected users
+          // socket.broadcast.emit('userOffline', id);
 
-
-          // // Update the user's last seen time in the database
-          // try {
-          //   const lastSeen = new Date();
-          //   await updateUserLastSeen(userId, lastSeen);
-
-          //   // Broadcast the updated last seen time to others
-          //   socket.broadcast.emit('updateLastSeen', { userId, lastSeen });
-          // } catch (error) {
-          //   console.error(`Failed to update last seen for user ${userId}:`, error);
-          // }
           break;
         }
       }

@@ -13,6 +13,7 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
   const [activeMessage, setActiveMessage] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [isOnline, setIsOnline] = useState(false);
 
   // Effect to fetch messages for the selected chat
   useEffect(() => {
@@ -40,9 +41,25 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
         }
       });
 
+      // // Update user status to online when connected
+      // socket.on('userOnline', (userId) => {
+      //   if (selectedChat._id === userId) {
+      //     setIsOnline(true);
+      //   }
+      // });
+
+      // // Update user status to offline when disconnected
+      // socket.on('userOffline', (userId) => {
+      //   if (selectedChat._id === userId) {
+      //     setIsOnline(false);
+      //   }
+      // });
+
       // Clean up the listener when the component unmounts or selectedChat changes
       return () => {
         socket.off('receiveMessage');
+        // socket.off('userOnline');
+        // socket.off('userOffline');
       };
     }
   }, [selectedChat, socket]);
@@ -116,9 +133,9 @@ const ChatWindow = ({ selectedChat, socket, user }) => {
           </div>
           <div>
             <div className="font-bold">{selectedChat?.otherUser || selectedChat?.user_name}</div>
-            <div className="text-sm text-gray-400">
-              {selectedChat?.isOnline ? "Online" : "Offline"}
-            </div>
+            {/* <div className="text-sm text-gray-400">
+              {isOnline ? "Online" : "Offline"}
+            </div> */}
           </div>
         </div>
       ) : (
